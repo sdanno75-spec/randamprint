@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>数学 演習プリント</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f5f3ec; --card:#fffdf8; --ink:#1c2230; --muted:#6b6f7a; --line:#e2dccd;
+  --err:#b8322a;
+  --font:'Zen Maru Gothic','Hiragino Maru Gothic ProN',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--font);line-height:1.6;-webkit-text-size-adjust:100%}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px 60px}
+header{padding:22px 0 10px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.brand h1{margin:0;font-size:24px;letter-spacing:.02em}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:4px;background:#ebe6d9;padding:4px;border-radius:12px;flex-wrap:wrap}
+.tabs button{border:0;background:transparent;padding:7px 14px;border-radius:9px;font-size:14px;font-weight:500;color:var(--muted)}
+.tabs button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.view{display:none}
+.view.show{display:block}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{border:1px solid var(--line);background:var(--card);padding:6px 12px;border-radius:999px;font-size:13px}
+.seg button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);padding:8px 14px;border-radius:10px;font-size:14px;font-weight:500}
+.btn svg{width:18px;height:18px}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ===== 設定パネル（グループ分け） ===== */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 16px;margin:12px 0 14px}
+.grp{display:grid;grid-template-columns:7.5em 1fr;gap:6px 12px;align-items:baseline;padding:10px 0;border-bottom:1px dashed var(--line)}
+.grp:last-child{border-bottom:0}
+.grp > div{min-width:0}
+.glab{font-weight:700;font-size:14px}
+.gnote{font-size:12px;color:var(--muted);margin-top:4px}
+.cat{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.cat-name{font-size:13px;font-weight:700;margin-right:4px}
+.mini{border:1px solid var(--line);background:var(--card);padding:3px 10px;border-radius:999px;font-size:12px;color:var(--muted)}
+.chk{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-size:14px;user-select:none}
+.chk input{accent-color:var(--ink);width:18px;height:18px;margin:0}
+.chk:has(input:checked){border-color:var(--ink);background:#efebe0}
+.chk small{color:var(--muted);font-size:11.5px}
+.num{display:inline-flex;align-items:center;gap:6px}
+.num button{width:34px;height:34px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:18px;line-height:1}
+.num output{min-width:3.2em;text-align:center;font-size:16px;font-weight:700}
+.txt{border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:#fff;width:100%;max-width:520px;font-size:14px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
+#status{font-size:13px;color:var(--muted)}
+#status.err{color:var(--err)}
+.pv-bar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:4px 0 12px;font-size:13px;color:var(--muted)}
+#layoutWarn{color:var(--err);font-size:13px;margin:0 0 8px}
+@media (max-width:600px){
+  .grp{grid-template-columns:1fr}
+  .btn{padding:7px 10px;font-size:13px}
+}
+
+/* ===== A4 シート（数I 基礎計算プリントの「しっかり解く」と同じ形） ===== */
+.sheet-wrap{overflow-x:auto;padding-bottom:20px}
+/* 高さは印刷と同じ 296mm（297mm だと紙からあふれて白紙のページが出る。画面と印刷で同じ高さで測る） */
+.sheet{width:210mm;height:296mm;margin:0 auto 24px;background:#fff;color:#111;box-shadow:0 2px 14px rgba(0,0,0,.14);padding:12mm 12mm 14mm;font-family:var(--font);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.sheet-wrap.show-q .sheet.ans{display:none}
+.sheet-wrap.show-a .sheet:not(.ans){display:none}
+.pgno{position:absolute;left:0;right:0;bottom:6mm;text-align:center;font-size:9pt;color:#555}
+.qz-head{border-bottom:1.5px solid #111;padding-bottom:2.5mm;margin-bottom:2.5mm}
+.qz-head h2{margin:0 0 2.5mm;font-size:15pt;font-weight:700}
+.qz-info{display:flex;align-items:flex-end;gap:6mm;font-size:10.5pt;white-space:nowrap}
+.qz-nm{flex:1;display:flex;align-items:flex-end;gap:2mm}
+.qz-nm .uline{flex:1;border-bottom:1px solid #111;height:1em}
+.qz-score{border:1.5px solid #111;padding:2mm 3mm;min-width:34mm;display:flex;justify-content:space-between;align-items:flex-end}
+.qz-score b{flex:1}
+/* 式は途中で折り返さない（はみ出しは点検で知らせる） */
+.sheet .katex{white-space:nowrap}
+.flow{flex:1;min-height:0;overflow:hidden}
+.no{font-weight:700;margin-right:1.5mm}
+.wcols{height:100%;display:flex;border-top:1px solid #999;border-bottom:1px solid #999}
+.wcol{flex:1;min-width:0;display:flex;flex-direction:column}
+.wcol.lcol{border-right:1px solid #999}
+.cell{flex:none;padding:2mm 3mm;font-size:10pt;border-bottom:1px dashed #c8c8c8;overflow:hidden}
+.cell .lb{display:flex;align-items:baseline;white-space:nowrap;overflow:hidden}
+.cell .qx{font-size:11pt}
+.cell .cd{font-size:9pt;color:#333;padding:.5mm 0 0 6mm;white-space:nowrap;overflow:hidden}
+
+/* 解答・解説（利用者の解答PDFと同じ並び：番号＋前置き、式は中央で＝をそろえる、表・※は字下げ） */
+.qa-wrap{flex:1;min-height:0;overflow:hidden;font-size:10pt}
+.qa{margin:0 0 3mm}
+.qa-head{line-height:1.7}
+.qa-text,.qa-note,.qa-alt{padding-left:7mm;line-height:1.7;margin:.6mm 0}
+.qa-alt{font-weight:700;margin-top:1.5mm}
+.qa-eq{overflow:hidden}
+.qa-eq .katex-display{margin:1mm 0}
+table.rg{border-collapse:collapse;margin:1.5mm auto}
+table.rg td{border:1px solid #111;padding:1mm 3mm;text-align:center}
+
+/* 裏のページ：下の部分に簡易解答を上下さかさまに（長辺とじの両面印刷で、下からめくると正しい向きで読める） */
+.kai{position:absolute;left:12mm;right:12mm;bottom:14mm;transform:rotate(180deg);border:1px solid #999;padding:3mm 4mm;font-size:10pt}
+.kai h3{margin:0 0 2mm;font-size:11pt}
+.kai-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5mm 8mm}
+.kai-a{white-space:nowrap;overflow:hidden}
+
+/* ===== 使い方・情報 ===== */
+.help{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 22px 16px;margin:12px 0}
+.help h2{font-size:17px;margin:16px 0 6px}
+.help ul{margin:0;padding-left:1.3em}
+.help li{margin:3px 0}
+.ver{font-size:13px;color:var(--muted)}
+.pnote{font-size:12px;color:var(--muted)}
+
+/* 印刷：画面の部品を消し、A4 の紙だけを1枚ずつ。プレビューのタブに関係なく問題も解答も全部出す */
+@media print{
+  @page{size:A4 portrait;margin:0}
+  body{background:#fff!important}
+  header,.panel,.actions,.pv-bar,#layoutWarn,#view-help{display:none!important}
+  #view-main{display:block!important}
+  .wrap{padding:0!important;max-width:none!important}
+  .sheet-wrap{overflow:visible;padding:0}
+  .sheet{display:flex!important;box-shadow:none;margin:0;height:296mm;page-break-after:always;break-after:page}
+  .sheet:last-child{page-break-after:auto;break-after:auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1>数学 演習プリント</h1>
+      <p>登録した問題から選んで、A4・2列のプリントと解答・解説を作ります。</p>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-view="main" class="on">プリント作成</button>
+      <button data-view="help">使い方・情報</button>
+    </nav>
+  </header>
+
+  <section class="view show" id="view-main">
+    <div class="panel">
+      <div class="grp">
+        <div class="glab">グループ</div>
+        <div id="groupBox"></div>
+      </div>
+      <div class="grp">
+        <div class="glab">問題数</div>
+        <div>
+          <span class="num"><button id="cntDown" aria-label="1問へらす">&minus;</button><output id="cntOut">5問</output><button id="cntUp" aria-label="1問ふやす">+</button></span>
+        </div>
+      </div>
+      <div class="grp">
+        <div class="glab">枚数</div>
+        <div>
+          <span class="num"><button id="setDown" aria-label="1枚へらす">&minus;</button><output id="setOut">1枚</output><button id="setUp" aria-label="1枚ふやす">+</button></span>
+          <div class="gnote">1枚ごとに問題を選びなおします。同じ枚の中では問題は重なりません。印刷・PDF は問題を全部出したあとに解答を同じ順で出します。</div>
+        </div>
+      </div>
+      <div class="grp">
+        <div class="glab">出す内容</div>
+        <div>
+          <div class="seg" id="outSeg">
+            <button data-out="q">問題だけ</button>
+            <button data-out="qk">問題＋簡易解答</button>
+            <button data-out="qa">問題＋解説</button>
+            <button data-out="all">すべて</button>
+          </div>
+          <div class="gnote">簡易解答は、各プリントの裏のページの下に上下さかさまに入ります。両面印刷（長辺とじ）にすると、下からめくって答えが見られます。プレビュー・印刷・PDF に同じ内容が出ます。</div>
+        </div>
+      </div>
+      <div class="grp">
+        <div class="glab">題名</div>
+        <div><input class="txt" id="title" maxlength="40"></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="btnMake">問題を作成する</button>
+      <button class="btn" id="btnPrint" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>印刷する</button>
+      <button class="btn" id="btnPdf" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M12 12v6"/><path d="M9 15l3 3 3-3"/></svg>PDFを保存</button>
+      <span class="pnote" id="pdfNote" hidden>印刷画面の「送信先」で「PDFに保存」を選んでください</span>
+      <span id="status"></span>
+    </div>
+    <div class="pv-bar">
+      <div class="seg" id="pvSeg">
+        <button data-pv="q" class="on">問題のみ</button>
+        <button data-pv="a">解答・解説</button>
+      </div>
+      <span id="pageInfo"></span>
+    </div>
+    <div id="layoutWarn"></div>
+    <div class="sheet-wrap" id="sheets"></div>
+  </section>
+
+  <section class="view" id="view-help">
+    <div class="help" id="helpBox"></div>
+  </section>
+</div>
+
+<script>
+'use strict';
+/* ===== 問題データ（tools/inject.mjs が書きこむ。手で編集しない） ===== */
+/* DATA:BEGIN */
+const CATEGORIES = [{"id":"sekibun","name":"積分計算","groups":[{"id":"shokyu","name":"初級編"}]}];
+const PROBLEMS = [
+{"id":"sekibun-shokyu-001","cat":"sekibun","group":"shokyu","no":1,"q":"\\int \\dfrac{1}{4x^{2}-4x+1}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\frac{1}{4x^2 - 4x + 1} \\, dx &= \\int \\frac{1}{(2x - 1)^2} \\, dx","&= \\ans{-\\frac{1}{2(2x - 1)} + C}"]}],"a":"-\\frac{1}{2(2x - 1)} + C","src":"main (1).tex (1)"},
+{"id":"sekibun-shokyu-002","cat":"sekibun","group":"shokyu","no":2,"q":"\\int \\pi^{2x-1}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\pi^{2x - 1} \\, dx &= \\ans{\\frac{\\pi^{2x - 1}}{2 \\log \\pi} + C}"]}],"a":"\\frac{\\pi^{2x - 1}}{2 \\log \\pi} + C","src":"main (1).tex (2)"},
+{"id":"sekibun-shokyu-003","cat":"sekibun","group":"shokyu","no":3,"q":"\\int \\sqrt{3x+1}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\sqrt{3x + 1} \\, dx &= \\frac{2}{3} \\cdot \\frac{1}{3} (3x + 1)^{\\frac{3}{2}}","&= \\ans{\\frac{2}{9}(3x + 1)^{\\frac{3}{2}} + C}"]}],"a":"\\frac{2}{9}(3x + 1)^{\\frac{3}{2}} + C","src":"main (1).tex (3)"},
+{"id":"sekibun-shokyu-004","cat":"sekibun","group":"shokyu","no":4,"q":"\\int (2x+1)^{3}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int (2x + 1)^3 \\, dx &= \\ans{\\frac{1}{8}(2x + 1)^4 + C}"]}],"a":"\\frac{1}{8}(2x + 1)^4 + C","src":"main (1).tex (4)"},
+{"id":"sekibun-shokyu-005","cat":"sekibun","group":"shokyu","no":5,"q":"\\int \\dfrac{e^{3x}}{e^{x}+1}\\,dx","cond":"","sol":[{"t":"lead","text":"$e^x + 1 = t$ とおくと， $e^x dx = dt$"},{"t":"eq","lines":["\\int \\frac{e^{3x}}{e^x + 1} \\, dx &= \\int \\frac{(t-1)^2}{t} \\, dt","&= \\int \\left( t - 2 + \\frac{1}{t} \\right) \\, dt","&= \\frac{1}{2}t^2 - 2t + \\log|t| + C","&= \\frac{1}{2}(e^x + 1)^2 - 2(e^x + 1) + \\log(e^x + 1) + C","&= \\ans{\\frac{e^{2x}}{2} - e^x + \\log(e^x + 1) + C}"]}],"a":"\\frac{e^{2x}}{2} - e^x + \\log(e^x + 1) + C","src":"main (1).tex (5)"},
+{"id":"sekibun-shokyu-006","cat":"sekibun","group":"shokyu","no":6,"q":"\\int \\dfrac{1}{\\sin x}\\,dx","cond":"","sol":[{"t":"lead","text":"$\\cos x = t$ とおくと， $-\\sin x dx = dt$"},{"t":"eq","lines":["\\int \\frac{1}{\\sin x} \\, dx &= \\int \\frac{\\sin x}{1 - \\cos^2 x} \\, dx","&= \\int \\frac{-1}{1 - t^2} \\, dt","&= \\int \\frac{1}{(t-1)(t+1)} \\, dt","&= \\frac{1}{2} \\int \\left( \\frac{1}{t-1} - \\frac{1}{t+1} \\right) \\, dt","&= \\frac{1}{2}(\\log|t-1| - \\log|t+1|) + C","&= \\frac{1}{2}\\log\\left|\\frac{\\cos x - 1}{\\cos x + 1}\\right| + C","&= \\ans{\\frac{1}{2}\\log\\frac{1 - \\cos x}{1 + \\cos x} + C}"]},{"t":"alt","text":"別解 1"},{"t":"eq","lines":["\\int \\frac{1}{\\sin x} \\, dx &= \\int \\frac{1}{2\\sin \\frac{x}{2} \\cos \\frac{x}{2}} \\, dx","&= \\int \\frac{1}{\\tan \\frac{x}{2} \\cdot 2\\cos^2 \\frac{x}{2}} \\, dx","&= \\int \\frac{1}{\\tan \\frac{x}{2}} \\left( \\tan \\frac{x}{2} \\right)' \\, dx","&= \\ans{\\log\\left|\\tan\\frac{x}{2}\\right| + C}"]},{"t":"alt","text":"別解 2"},{"t":"eq","lines":["\\int \\frac{1}{\\sin x} \\, dx &= \\int \\frac{1 - \\cos x + \\cos x}{\\sin x} \\, dx","&= \\int \\left\\{ \\frac{\\sin^2 x}{\\sin x(1+\\cos x)} + \\frac{\\cos x}{\\sin x} \\right\\} \\, dx","&= \\int \\left( \\frac{\\sin x}{1+\\cos x} + \\frac{\\cos x}{\\sin x} \\right) \\, dx","&= -\\log|1+\\cos x| + \\log|\\sin x| + C","&= \\ans{\\log \\frac{|\\sin x|}{1+\\cos x} + C}"]}],"a":"\\frac{1}{2}\\log\\frac{1 - \\cos x}{1 + \\cos x} + C","src":"main (1).tex (6)"},
+{"id":"sekibun-shokyu-007","cat":"sekibun","group":"shokyu","no":7,"q":"\\int \\dfrac{1}{\\cos x}\\,dx","cond":"","sol":[{"t":"lead","text":"$\\sin x = t$ とおくと， $\\cos x dx = dt$"},{"t":"eq","lines":["\\int \\frac{1}{\\cos x} \\, dx &= \\int \\frac{\\cos x}{1 - \\sin^2 x} \\, dx","&= \\int \\frac{1}{1 - t^2} \\, dt","&= \\int \\frac{1}{(1-t)(1+t)} \\, dt","&= \\frac{1}{2}\\int\\left(\\frac{1}{1-t} + \\frac{1}{1+t}\\right)dt","&= \\frac{1}{2}(-\\log|1-t| + \\log|1+t|) + C","&= \\ans{\\frac{1}{2}\\log \\frac{1+\\sin x}{1-\\sin x} + C}"]},{"t":"alt","text":"別解"},{"t":"eq","lines":["\\int \\frac{1}{\\cos x} \\, dx &= \\int \\frac{1 - \\sin x + \\sin x}{\\cos x} \\, dx","&= \\int \\left\\{ \\frac{1 - \\sin^2 x}{\\cos x(1 + \\sin x)} + \\frac{\\sin x}{\\cos x} \\right\\} \\, dx","&= \\int \\left( \\frac{\\cos x}{1 + \\sin x} - \\frac{-\\sin x}{\\cos x} \\right) \\, dx","&= \\log|1 + \\sin x| - \\log|\\cos x| + C","&= \\ans{\\log \\frac{1 + \\sin x}{|\\cos x|} + C}"]}],"a":"\\frac{1}{2}\\log \\frac{1+\\sin x}{1-\\sin x} + C","src":"main (1).tex (7)"},
+{"id":"sekibun-shokyu-008","cat":"sekibun","group":"shokyu","no":8,"q":"\\int \\tan x\\,dx","cond":"","sol":[{"t":"lead","text":"$\\cos x = t$ とおくと， $-\\sin x dx = dt$"},{"t":"eq","lines":["\\int \\tan x \\, dx &= \\int \\frac{\\sin x}{\\cos x} \\, dx","&= \\int \\frac{-1}{t} \\, dt","&= -\\log|t| + C","&= \\ans{-\\log|\\cos x| + C}"]}],"a":"-\\log|\\cos x| + C","src":"main (1).tex (8)"},
+{"id":"sekibun-shokyu-009","cat":"sekibun","group":"shokyu","no":9,"q":"\\int \\dfrac{1}{x(\\log x)^{2}}\\,dx","cond":"","sol":[{"t":"lead","text":"$\\log x = t$ とおくと， $\\frac{1}{x}dx = dt$"},{"t":"eq","lines":["\\int \\frac{1}{x(\\log x)^2} \\, dx &= \\int \\frac{1}{t^2} \\, dt","&= -\\frac{1}{t} + C","&= \\ans{-\\frac{1}{\\log x} + C}"]}],"a":"-\\frac{1}{\\log x} + C","src":"main (1).tex (9)"},
+{"id":"sekibun-shokyu-010","cat":"sekibun","group":"shokyu","no":10,"q":"\\int \\dfrac{e^{x}-e^{-x}}{e^{x}+e^{-x}}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\frac{e^x - e^{-x}}{e^x + e^{-x}} \\, dx &= \\int \\frac{(e^x + e^{-x})'}{e^x + e^{-x}} \\, dx","&= \\ans{\\log(e^x + e^{-x}) + C}"]},{"t":"note","text":"双曲線関数 $\\tanh x = \\frac{e^x - e^{-x}}{e^x + e^{-x}}$ の不定積分です．"}],"a":"\\log(e^x + e^{-x}) + C","src":"main (1).tex (10)"},
+{"id":"sekibun-shokyu-011","cat":"sekibun","group":"shokyu","no":11,"q":"\\int \\dfrac{x^{2}}{\\sqrt{x-1}}\\,dx","cond":"","sol":[{"t":"lead","text":"$x - 1 = t$ とおくと， $dx = dt$"},{"t":"eq","lines":["\\int \\frac{x^2}{\\sqrt{x-1}} \\, dx &= \\int \\frac{(t+1)^2}{\\sqrt{t}} \\, dt","&= \\int (t^{\\frac{3}{2}} + 2t^{\\frac{1}{2}} + t^{-\\frac{1}{2}}) \\, dt","&= \\frac{2}{5}t^{\\frac{5}{2}} + \\frac{4}{3}t^{\\frac{3}{2}} + 2t^{\\frac{1}{2}} + C","&= \\frac{2}{15}\\sqrt{t}(3t^2 + 10t + 15) + C","&= \\ans{\\frac{2}{15}\\sqrt{x-1}(3x^2 + 4x + 8) + C}"]}],"a":"\\frac{2}{15}\\sqrt{x-1}(3x^2 + 4x + 8) + C","src":"main (1).tex (11)"},
+{"id":"sekibun-shokyu-012","cat":"sekibun","group":"shokyu","no":12,"q":"\\int xe^{-2x}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int xe^{-2x} \\, dx &= x \\left(-\\frac{1}{2}e^{-2x}\\right) - \\int 1 \\cdot \\left(-\\frac{1}{2}e^{-2x}\\right) \\, dx","&= -\\frac{x}{2}e^{-2x} + \\int \\frac{1}{2}e^{-2x} \\, dx","&= \\ans{-\\frac{x}{2}e^{-2x} - \\frac{1}{4}e^{-2x} + C}"]}],"a":"-\\frac{x}{2}e^{-2x} - \\frac{1}{4}e^{-2x} + C","src":"main (1).tex (12)"},
+{"id":"sekibun-shokyu-013","cat":"sekibun","group":"shokyu","no":13,"q":"\\int x^{2}e^{-x}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int x^2 e^{-x} \\, dx &= x^2(-e^{-x}) - \\int 2x(-e^{-x}) \\, dx","&= -x^2 e^{-x} + \\int 2x e^{-x} \\, dx","&= -x^2 e^{-x} + 2x(-e^{-x}) - \\int 2(-e^{-x}) \\, dx","&= -x^2 e^{-x} - 2xe^{-x} + \\int 2e^{-x} \\, dx","&= \\ans{-x^2 e^{-x} - 2xe^{-x} - 2e^{-x} + C}"]}],"a":"-x^2 e^{-x} - 2xe^{-x} - 2e^{-x} + C","src":"main (1).tex (13)"},
+{"id":"sekibun-shokyu-014","cat":"sekibun","group":"shokyu","no":14,"q":"\\int \\log x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int 1 \\cdot \\log x \\, dx &= x\\log x - \\int x \\cdot \\frac{1}{x} \\, dx","&= \\ans{x\\log x - x + C}"]}],"a":"x\\log x - x + C","src":"main (1).tex (14)"},
+{"id":"sekibun-shokyu-015","cat":"sekibun","group":"shokyu","no":15,"q":"\\int \\log(x+2)\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\log(x+2) \\, dx &= \\int (x+2)'\\log(x+2) \\, dx","&= (x+2)\\log(x+2) - \\int (x+2)\\frac{1}{x+2} \\, dx","&= \\ans{(x+2)\\log(x+2) - x + C}"]}],"a":"(x+2)\\log(x+2) - x + C","src":"main (1).tex (15)"},
+{"id":"sekibun-shokyu-016","cat":"sekibun","group":"shokyu","no":16,"q":"\\int x\\log x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int x\\log x \\, dx &= \\frac{x^2}{2}\\log x - \\int \\frac{x^2}{2} \\cdot \\frac{1}{x} \\, dx","&= \\ans{\\frac{x^2}{2}\\log x - \\frac{x^2}{4} + C}"]}],"a":"\\frac{x^2}{2}\\log x - \\frac{x^2}{4} + C","src":"main (1).tex (16)"},
+{"id":"sekibun-shokyu-017","cat":"sekibun","group":"shokyu","no":17,"q":"\\int \\log_{2}x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\log_2 x \\, dx &= x\\log_2 x - \\int x \\cdot \\frac{1}{x\\log 2} \\, dx","&= \\ans{x\\log_2 x - \\frac{x}{\\log 2} + C}"]},{"t":"alt","text":"別解"},{"t":"eq","lines":["\\int \\log_2 x \\, dx &= \\int \\frac{\\log x}{\\log 2} \\, dx","&= \\frac{x\\log x}{\\log 2} - \\int x \\cdot \\frac{1}{x\\log 2} \\, dx","&= \\ans{x\\log_2 x - \\frac{x}{\\log 2} + C}"]}],"a":"x\\log_2 x - \\frac{x}{\\log 2} + C","src":"main (1).tex (17)"},
+{"id":"sekibun-shokyu-018","cat":"sekibun","group":"shokyu","no":18,"q":"\\int x^{2}\\cos x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int x^2 \\cos x \\, dx &= x^2 \\sin x - \\int 2x \\sin x \\, dx","&= x^2 \\sin x - \\left( 2x(-\\cos x) - \\int 2(-\\cos x) \\, dx \\right)","&= x^2 \\sin x + 2x \\cos x - \\int 2\\cos x \\, dx","&= \\ans{x^2 \\sin x + 2x \\cos x - 2\\sin x + C}"]}],"a":"x^2 \\sin x + 2x \\cos x - 2\\sin x + C","src":"main (1).tex (18)"},
+{"id":"sekibun-shokyu-019","cat":"sekibun","group":"shokyu","no":19,"q":"\\int x\\sin^{2} x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int x \\sin^2 x \\, dx &= \\int x \\cdot \\frac{1 - \\cos 2x}{2} \\, dx","&= \\frac{1}{2} \\int (x - x\\cos 2x) \\, dx","&= \\frac{1}{2} \\left\\{ \\frac{x^2}{2} - \\left( \\frac{x}{2}\\sin 2x - \\int \\frac{1}{2}\\sin 2x \\, dx \\right) \\right\\}","&= \\frac{x^2}{4} - \\frac{x}{4}\\sin 2x + \\frac{1}{4} \\int \\sin 2x \\, dx","&= \\ans{\\frac{x^2}{4} - \\frac{x}{4}\\sin 2x - \\frac{1}{8}\\cos 2x + C}"]}],"a":"\\frac{x^2}{4} - \\frac{x}{4}\\sin 2x - \\frac{1}{8}\\cos 2x + C","src":"main (1).tex (19)"},
+{"id":"sekibun-shokyu-020","cat":"sekibun","group":"shokyu","no":20,"q":"\\int \\dfrac{x}{5^{x}}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\frac{x}{5^x} \\, dx &= \\int x \\cdot 5^{-x} \\, dx","&= x \\left( -\\frac{5^{-x}}{\\log 5} \\right) - \\int \\left( -\\frac{5^{-x}}{\\log 5} \\right) \\, dx","&= -\\frac{x}{5^x \\log 5} + \\int \\frac{5^{-x}}{\\log 5} \\, dx","&= \\ans{-\\frac{x}{5^x \\log 5} - \\frac{1}{5^x(\\log 5)^2} + C}"]}],"a":"-\\frac{x}{5^x \\log 5} - \\frac{1}{5^x(\\log 5)^2} + C","src":"main (1).tex (20)"},
+{"id":"sekibun-shokyu-021","cat":"sekibun","group":"shokyu","no":21,"q":"\\int \\dfrac{3x-2}{x+1}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\frac{3x - 2}{x+1} \\, dx &= \\int \\frac{3(x+1) - 5}{x+1} \\, dx","&= \\int \\left( 3 - \\frac{5}{x+1} \\right) \\, dx","&= \\ans{3x - 5\\log|x+1| + C}"]}],"a":"3x - 5\\log|x+1| + C","src":"main (1).tex (21)"},
+{"id":"sekibun-shokyu-022","cat":"sekibun","group":"shokyu","no":22,"q":"\\int \\dfrac{x^{2}+6x+9}{x+2}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\frac{x^2+6x+9}{x+2} \\, dx &= \\int \\frac{(x+4)(x+2)+1}{x+2} \\, dx","&= \\int \\left( x+4+\\frac{1}{x+2} \\right) \\, dx","&= \\ans{\\frac{1}{2}x^2 + 4x + \\log|x+2| + C}"]}],"a":"\\frac{1}{2}x^2 + 4x + \\log|x+2| + C","src":"main (1).tex (22)"},
+{"id":"sekibun-shokyu-023","cat":"sekibun","group":"shokyu","no":23,"q":"\\int \\dfrac{1}{x^{2}-1}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\frac{1}{x^2-1} \\, dx &= \\int \\frac{1}{(x-1)(x+1)} \\, dx","&= \\frac{1}{2} \\int \\left( \\frac{1}{x-1} - \\frac{1}{x+1} \\right) \\, dx","&= \\frac{1}{2}(\\log|x-1| - \\log|x+1|) + C","&= \\ans{\\frac{1}{2}\\log\\left|\\frac{x-1}{x+1}\\right| + C}"]}],"a":"\\frac{1}{2}\\log\\left|\\frac{x-1}{x+1}\\right| + C","src":"main (1).tex (23)"},
+{"id":"sekibun-shokyu-024","cat":"sekibun","group":"shokyu","no":24,"q":"\\int \\dfrac{x-4}{2x^{2}+5x+2}\\,dx","cond":"","sol":[{"t":"lead","text":"$\\dfrac{x-4}{2x^2+5x+2} = \\dfrac{a}{x+2} + \\dfrac{b}{2x+1}$ として，両辺 $2x^2+5x+2$ かけると"},{"t":"eq","lines":["& x-4 = a(2x+1) + b(x+2)","& \\therefore \\begin{cases} 1 = 2a+b \\\\ -4 = a+2b \\end{cases}","& \\therefore a = 2, \\ b = -3"]},{"t":"eq","lines":["\\int \\frac{x-4}{2x^2+5x+2} \\, dx &= \\int \\left( \\frac{2}{x+2} - \\frac{3}{2x+1} \\right) \\, dx","&= 2\\log|x+2| - \\frac{3}{2}\\log|2x+1| + C","&= \\ans{\\log\\frac{(x+2)^2}{|2x+1|^{\\frac{3}{2}}} + C}"]}],"a":"\\log\\frac{(x+2)^2}{|2x+1|^{\\frac{3}{2}}} + C","src":"main (1).tex (24)"},
+{"id":"sekibun-shokyu-025","cat":"sekibun","group":"shokyu","no":25,"q":"\\int \\sin^{2}x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\sin^2 x \\, dx &= \\int \\frac{1-\\cos 2x}{2} \\, dx","&= \\ans{\\frac{1}{2}x - \\frac{1}{4}\\sin 2x + C}"]}],"a":"\\frac{1}{2}x - \\frac{1}{4}\\sin 2x + C","src":"main (1).tex (25)"},
+{"id":"sekibun-shokyu-026","cat":"sekibun","group":"shokyu","no":26,"q":"\\int \\cos^{2}x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\cos^2 x \\, dx &= \\int \\frac{1+\\cos 2x}{2} \\, dx","&= \\ans{\\frac{1}{2}x + \\frac{1}{4}\\sin 2x + C}"]}],"a":"\\frac{1}{2}x + \\frac{1}{4}\\sin 2x + C","src":"main (1).tex (26)"},
+{"id":"sekibun-shokyu-027","cat":"sekibun","group":"shokyu","no":27,"q":"\\int \\cos^{3}x\\,dx","cond":"","sol":[{"t":"lead","text":"$\\sin x = t$ とおくと， $\\cos x dx = dt$"},{"t":"eq","lines":["\\int \\cos^3 x \\, dx &= \\int (1-\\sin^2 x)\\cos x \\, dx","&= \\int (1-t^2) \\, dt","&= t - \\frac{1}{3}t^3 + C","&= \\ans{\\sin x - \\frac{1}{3}\\sin^3 x + C}"]},{"t":"alt","text":"別解"},{"t":"text","text":"3倍角の公式を使う．"},{"t":"eq","lines":["\\int \\cos^3 x \\, dx &= \\int \\left( \\frac{1}{4}\\cos 3x + \\frac{3}{4}\\cos x \\right) \\, dx","&= \\ans{\\frac{1}{12}\\sin 3x + \\frac{3}{4}\\sin x + C}"]}],"a":"\\sin x - \\frac{1}{3}\\sin^3 x + C","src":"main (1).tex (27)"},
+{"id":"sekibun-shokyu-028","cat":"sekibun","group":"shokyu","no":28,"q":"\\int \\tan^{2}x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\tan^2 x \\, dx &= \\int \\left( \\frac{1}{\\cos^2 x} - 1 \\right) \\, dx","&= \\ans{\\tan x - x + C}"]}],"a":"\\tan x - x + C","src":"main (1).tex (28)"},
+{"id":"sekibun-shokyu-029","cat":"sekibun","group":"shokyu","no":29,"q":"\\int \\cos 4x\\cos 2x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\cos 4x \\cos 2x \\, dx &= \\int \\frac{1}{2} \\{ \\cos(4x+2x) + \\cos(4x-2x) \\} \\, dx","&= \\int \\frac{1}{2}(\\cos 6x + \\cos 2x) \\, dx","&= \\ans{\\frac{1}{12}\\sin 6x + \\frac{1}{4}\\sin 2x + C}"]},{"t":"note","text":"積和変換公式を使います．"}],"a":"\\frac{1}{12}\\sin 6x + \\frac{1}{4}\\sin 2x + C","src":"main (1).tex (29)"},
+{"id":"sekibun-shokyu-030","cat":"sekibun","group":"shokyu","no":30,"q":"\\int \\sin 4x \\sin 3x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\sin 4x \\sin 3x \\, dx &= \\int \\frac{1}{2} \\{ \\cos(4x-3x) - \\cos(4x+3x) \\} \\, dx","&= \\int \\frac{1}{2}(\\cos x - \\cos 7x) \\, dx","&= \\ans{\\frac{1}{2}\\sin x - \\frac{1}{14}\\sin 7x + C}"]},{"t":"note","text":"積和変換公式を使います．"}],"a":"\\frac{1}{2}\\sin x - \\frac{1}{14}\\sin 7x + C","src":"main (1).tex (30)"},
+{"id":"sekibun-shokyu-031","cat":"sekibun","group":"shokyu","no":31,"q":"\\int \\sin^{2}x\\cos^{3}x\\,dx","cond":"","sol":[{"t":"lead","text":"$\\sin x = t$ とおくと， $\\cos x dx = dt$"},{"t":"eq","lines":["\\int \\sin^2 x \\cos^3 x \\, dx &= \\int \\sin^2 x(1-\\sin^2 x)\\cos x \\, dx","&= \\int t^2(1-t^2) \\, dt","&= \\frac{1}{3}t^3 - \\frac{1}{5}t^5 + C","&= \\ans{\\frac{1}{3}\\sin^3 x - \\frac{1}{5}\\sin^5 x + C}"]}],"a":"\\frac{1}{3}\\sin^3 x - \\frac{1}{5}\\sin^5 x + C","src":"main (1).tex (31)"},
+{"id":"sekibun-shokyu-032","cat":"sekibun","group":"shokyu","no":32,"q":"\\int \\sin x\\cos x\\cos2x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int \\sin x \\cos x \\cos 2x \\, dx &= \\frac{1}{2} \\int \\sin 2x \\cos 2x \\, dx","&= \\frac{1}{4} \\int \\sin 4x \\, dx","&= \\ans{-\\frac{1}{16}\\cos 4x + C}"]}],"a":"-\\frac{1}{16}\\cos 4x + C","src":"main (1).tex (32)"},
+{"id":"sekibun-shokyu-033","cat":"sekibun","group":"shokyu","no":33,"q":"\\int_{0}^{2}\\sqrt{4-x^{2}}\\,dx","cond":"","sol":[{"t":"lead","text":"扇型の面積であることを利用すると"},{"t":"eq","lines":["\\int_0^2 \\sqrt{4-x^2} \\, dx &= 4\\pi \\times \\frac{1}{4} = \\ans{\\pi}"]}],"a":"\\pi","src":"main (1).tex (33)"},
+{"id":"sekibun-shokyu-034","cat":"sekibun","group":"shokyu","no":34,"q":"\\int_{\\sqrt{3}}^{2}\\sqrt{4-x^{2}}\\,dx","cond":"","sol":[{"t":"lead","text":"扇形の面積から直角三角形の面積を引くと"},{"t":"eq","lines":["\\int_{\\sqrt{3}}^2 \\sqrt{4-x^2} \\, dx &= 4\\pi \\cdot \\frac{1}{12} - \\sqrt{3} \\cdot 1 \\cdot \\frac{1}{2}","&= \\ans{\\frac{\\pi}{3} - \\frac{\\sqrt{3}}{2}}"]}],"a":"\\frac{\\pi}{3} - \\frac{\\sqrt{3}}{2}","src":"main (1).tex (34)"},
+{"id":"sekibun-shokyu-035","cat":"sekibun","group":"shokyu","no":35,"q":"\\int_{-2}^{4}\\sqrt{16-x^{2}}\\,dx","cond":"","sol":[{"t":"lead","text":"扇型と直角三角形の面積の和であることを利用すると"},{"t":"eq","lines":["\\int_{-2}^4 \\sqrt{16-x^2} \\, dx &= 16\\pi \\times \\frac{1}{3} + 2 \\cdot 2\\sqrt{3} \\cdot \\frac{1}{2}","&= \\ans{\\frac{16}{3}\\pi + 2\\sqrt{3}}"]}],"a":"\\frac{16}{3}\\pi + 2\\sqrt{3}","src":"main (1).tex (35)"},
+{"id":"sekibun-shokyu-036","cat":"sekibun","group":"shokyu","no":36,"q":"\\int_{0}^{1}\\dfrac{1}{\\sqrt{4-x^{2}}}\\,dx","cond":"","sol":[{"t":"lead","text":"$x = 2\\sin\\theta$ とおくと， $dx = 2\\cos\\theta d\\theta$"},{"t":"text","text":"積分範囲は"},{"t":"range","rows":[["x","0 \\to 1"],["\\theta","0 \\to \\frac{\\pi}{6}"]]},{"t":"text","text":"となるので"},{"t":"eq","lines":["\\int_0^1 \\frac{1}{\\sqrt{4-x^2}} \\, dx &= \\int_0^{\\frac{\\pi}{6}} \\frac{1}{\\sqrt{4-4\\sin^2\\theta}} \\cdot 2\\cos\\theta \\, d\\theta","&= \\int_0^{\\frac{\\pi}{6}} \\frac{1}{\\sqrt{4\\cos^2\\theta}} \\cdot 2\\cos\\theta \\, d\\theta","&= \\int_0^{\\frac{\\pi}{6}} 1 \\, d\\theta","&= \\left[ \\theta \\right]_0^{\\frac{\\pi}{6}}","&= \\ans{\\frac{\\pi}{6}}"]}],"a":"\\frac{\\pi}{6}","src":"main (1).tex (36)"},
+{"id":"sekibun-shokyu-037","cat":"sekibun","group":"shokyu","no":37,"q":"\\int_{-1}^{3}\\dfrac{1}{x^{2}+3}\\,dx","cond":"","sol":[{"t":"lead","text":"$x = \\sqrt{3}\\tan\\theta \\ \\left( -\\frac{\\pi}{2} < \\theta < \\frac{\\pi}{2} \\right)$ とおくと"},{"t":"text","text":"$dx = \\dfrac{\\sqrt{3}}{\\cos^2\\theta} d\\theta$"},{"t":"text","text":"積分範囲は"},{"t":"range","rows":[["x","-1 \\to 3"],["\\theta","-\\frac{\\pi}{6} \\to \\frac{\\pi}{3}"]]},{"t":"text","text":"となるので"},{"t":"eq","lines":["\\int_{-1}^3 \\frac{1}{x^2+3} \\, dx &= \\int_{-\\frac{\\pi}{6}}^{\\frac{\\pi}{3}} \\frac{1}{3(1+\\tan^2\\theta)} \\cdot \\frac{\\sqrt{3}}{\\cos^2\\theta} \\, d\\theta","&= \\int_{-\\frac{\\pi}{6}}^{\\frac{\\pi}{3}} \\frac{\\sqrt{3}}{3} \\, d\\theta","&= \\left[ \\frac{\\sqrt{3}}{3} \\theta \\right]_{-\\frac{\\pi}{6}}^{\\frac{\\pi}{3}}","&= \\frac{\\sqrt{3}}{6}\\pi = \\ans{\\frac{\\sqrt{3}}{6}\\pi}"]},{"t":"note","text":"$\\theta$ の範囲を気にせず例えば $x: -1 \\to 3$, $\\theta: \\frac{5}{6}\\pi \\to \\frac{\\pi}{3}$ などとして計算すると誤った値が出てきてしまいます．$x = \\sqrt{3}\\tan\\theta$ が連続(微分可能)であるように $\\theta$ の範囲設定が必要で，その範囲内で置換します．"}],"a":"\\frac{\\sqrt{3}}{6}\\pi","src":"main (1).tex (37)"},
+{"id":"sekibun-shokyu-038","cat":"sekibun","group":"shokyu","no":38,"q":"\\int_{-1}^{0}\\dfrac{1}{x^{2}+2x+2}\\,dx","cond":"","sol":[{"t":"lead","text":"$x+1 = \\tan\\theta$ とおくと， $dx = \\dfrac{1}{\\cos^2\\theta} d\\theta$"},{"t":"text","text":"積分範囲は"},{"t":"range","rows":[["x","-1 \\to 0"],["\\theta","0 \\to \\frac{\\pi}{4}"]]},{"t":"text","text":"となるので"},{"t":"eq","lines":["\\int_{-1}^0 \\frac{1}{x^2+2x+2} \\, dx &= \\int_{-1}^0 \\frac{1}{(x+1)^2+1} \\, dx","&= \\int_0^{\\frac{\\pi}{4}} \\frac{1}{\\tan^2\\theta+1} \\cdot \\frac{1}{\\cos^2\\theta} \\, d\\theta","&= \\int_0^{\\frac{\\pi}{4}} 1 \\, d\\theta","&= \\left[ \\theta \\right]_0^{\\frac{\\pi}{4}}","&= \\ans{\\frac{\\pi}{4}}"]}],"a":"\\frac{\\pi}{4}","src":"main (1).tex (38)"},
+{"id":"sekibun-shokyu-039","cat":"sekibun","group":"shokyu","no":39,"q":"\\int_{2}^{5}x\\sqrt{x-2}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int_2^5 x\\sqrt{x-2} \\, dx &= \\int_2^5 (x-2+2)\\sqrt{x-2} \\, dx","&= \\int_2^5 \\left\\{ (x-2)^{\\frac{3}{2}} + 2(x-2)^{\\frac{1}{2}} \\right\\} \\, dx","&= \\left[ \\frac{2}{5}(x-2)^{\\frac{5}{2}} + \\frac{4}{3}(x-2)^{\\frac{3}{2}} \\right]_2^5","&= \\ans{\\frac{38\\sqrt{3}}{5}}"]}],"a":"\\frac{38\\sqrt{3}}{5}","src":"main (1).tex (39)"},
+{"id":"sekibun-shokyu-040","cat":"sekibun","group":"shokyu","no":40,"q":"\\int_{e}^{e^{2}}\\dfrac{1}{x\\log x}\\,dx","cond":"","sol":[{"t":"lead","text":"$\\log x = t$ とおくと， $\\dfrac{1}{x} dx = dt$"},{"t":"text","text":"積分範囲は"},{"t":"range","rows":[["x","e \\to e^2"],["t","1 \\to 2"]]},{"t":"text","text":"となるので"},{"t":"eq","lines":["\\int_e^{e^2} \\frac{1}{x\\log x} \\, dx &= \\int_1^2 \\frac{1}{t} \\, dt","&= \\left[ \\log|t| \\right]_1^2","&= \\ans{\\log 2}"]}],"a":"\\log 2","src":"main (1).tex (40)"},
+{"id":"sekibun-shokyu-041","cat":"sekibun","group":"shokyu","no":41,"q":"\\int_{0}^{\\pi}x\\sin 2x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int_0^\\pi x\\sin 2x \\, dx &= \\left[ x\\left(-\\frac{1}{2}\\cos 2x\\right) \\right]_0^\\pi - \\int_0^\\pi \\left(-\\frac{1}{2}\\cos 2x\\right) \\, dx","&= -\\frac{\\pi}{2} + \\int_0^\\pi \\frac{1}{2}\\cos 2x \\, dx","&= -\\frac{\\pi}{2} + \\left[ \\frac{1}{4}\\sin 2x \\right]_0^\\pi","&= \\ans{-\\frac{\\pi}{2}}"]}],"a":"-\\frac{\\pi}{2}","src":"main (1).tex (41)"},
+{"id":"sekibun-shokyu-042","cat":"sekibun","group":"shokyu","no":42,"q":"\\int_{1}^{e}x(\\log x)^{2}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int_1^e x(\\log x)^2 \\, dx &= \\left[ \\frac{x^2}{2}(\\log x)^2 \\right]_1^e - \\int_1^e \\frac{x^2}{2} \\cdot 2(\\log x)\\frac{1}{x} \\, dx","&= \\frac{e^2}{2} - \\int_1^e x\\log x \\, dx","&= \\frac{e^2}{2} - \\left( \\left[ \\frac{x^2}{2}\\log x \\right]_1^e - \\int_1^e \\frac{x^2}{2} \\cdot \\frac{1}{x} \\, dx \\right)","&= \\frac{e^2}{2} - \\frac{e^2}{2} + \\int_1^e \\frac{x}{2} \\, dx","&= \\left[ \\frac{x^2}{4} \\right]_1^e","&= \\ans{\\frac{e^2-1}{4}}"]}],"a":"\\frac{e^2-1}{4}","src":"main (1).tex (42)"},
+{"id":"sekibun-shokyu-043","cat":"sekibun","group":"shokyu","no":43,"q":"\\int_{\\alpha}^{\\beta}(x-\\alpha)(x-\\beta)\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int_\\alpha^\\beta (x-\\alpha)(x-\\beta) \\, dx &= \\left[ \\frac{1}{2}(x-\\alpha)^2(x-\\beta) \\right]_\\alpha^\\beta - \\int_\\alpha^\\beta \\frac{1}{2}(x-\\alpha)^2 \\, dx","&= - \\left[ \\frac{1}{6}(x-\\alpha)^3 \\right]_\\alpha^\\beta","&= \\ans{-\\frac{1}{6}(\\beta-\\alpha)^3}"]},{"t":"note","text":"$\\frac{1}{6}$ 公式という名前で有名で，それの導出です．数学III既習者としては部分積分が楽です．"}],"a":"-\\frac{1}{6}(\\beta-\\alpha)^3","src":"main (1).tex (43)"},
+{"id":"sekibun-shokyu-044","cat":"sekibun","group":"shokyu","no":44,"q":"\\int_{1-\\sqrt{2}}^{1+\\sqrt{2}}(x^{2}-2x-1)\\,dx","cond":"","sol":[{"t":"lead","text":"$x-1 = t$ とおくと， $dx = dt$"},{"t":"text","text":"積分範囲は"},{"t":"range","rows":[["x","1-\\sqrt{2} \\to 1+\\sqrt{2}"],["t","-\\sqrt{2} \\to \\sqrt{2}"]]},{"t":"text","text":"となるので"},{"t":"eq","lines":["\\int_{1-\\sqrt{2}}^{1+\\sqrt{2}} (x^2-2x-1) \\, dx &= \\int_{1-\\sqrt{2}}^{1+\\sqrt{2}} \\{(x-1)^2-2\\} \\, dx","&= \\int_{-\\sqrt{2}}^{\\sqrt{2}} (t^2-2) \\, dt","&= 2\\int_0^{\\sqrt{2}} (t^2-2) \\, dt","&= 2\\left[ \\frac{1}{3}t^3 - 2t \\right]_0^{\\sqrt{2}}","&= \\ans{-\\frac{8\\sqrt{2}}{3}}"]},{"t":"alt","text":"別解"},{"t":"text","text":"$\\alpha = 1-\\sqrt{2}, \\ \\beta = 1+\\sqrt{2}$ とおくと"},{"t":"eq","lines":["\\int_{1-\\sqrt{2}}^{1+\\sqrt{2}} (x^2-2x-1) \\, dx &= \\int_\\alpha^\\beta \\{x^2-(\\alpha+\\beta)x+\\alpha\\beta\\} \\, dx","&= \\int_\\alpha^\\beta (x-\\alpha)(x-\\beta) \\, dx","&= \\left[ \\frac{1}{2}(x-\\alpha)^2(x-\\beta) \\right]_\\alpha^\\beta - \\int_\\alpha^\\beta \\frac{1}{2}(x-\\alpha)^2 \\, dx","&= - \\left[ \\frac{1}{6}(x-\\alpha)^3 \\right]_\\alpha^\\beta","&= -\\frac{1}{6}(\\beta-\\alpha)^3","&= \\ans{-\\frac{8\\sqrt{2}}{3}}"]},{"t":"note","text":"別解では $\\frac{1}{6}$ 公式を適用して導く手段を取りました．$\\frac{1}{6}$ 公式は証明せず使ってよいという場面が多いですが，導けるようにしておきたいです．"}],"a":"-\\frac{8\\sqrt{2}}{3}","src":"main (1).tex (44)"},
+{"id":"sekibun-shokyu-045","cat":"sekibun","group":"shokyu","no":45,"q":"\\int_{1}^{2}\\dfrac{4x+5}{2x^{2}+5x-3}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int_1^2 \\frac{4x+5}{2x^2+5x-3} \\, dx &= \\left[ \\log|2x^2+5x-3| \\right]_1^2","&= \\log 15 - \\log 4","&= \\ans{\\log\\frac{15}{4}}"]}],"a":"\\log\\frac{15}{4}","src":"main (1).tex (45)"},
+{"id":"sekibun-shokyu-046","cat":"sekibun","group":"shokyu","no":46,"q":"\\int_{0}^{\\frac{1}{2}}\\dfrac{5x+1}{2x^{2}-x-1}\\,dx","cond":"","sol":[{"t":"lead","text":"$\\dfrac{5x+1}{2x^2-x-1} = \\dfrac{a}{2x+1} + \\dfrac{b}{x-1}$ として，両辺 $2x^2-x-1$ かけると"},{"t":"eq","lines":["& 5x+1 = a(x-1) + b(2x+1)","& \\therefore \\begin{cases} 5 = a + 2b \\\\ 1 = -a + b \\end{cases}","& \\therefore a = 1, \\ b = 2"]},{"t":"eq","lines":["\\int_0^{\\frac{1}{2}} \\frac{5x+1}{2x^2-x-1} \\, dx &= \\int_0^{\\frac{1}{2}} \\left( \\frac{1}{2x+1} + \\frac{2}{x-1} \\right) \\, dx","&= \\left[ \\frac{1}{2}\\log|2x+1| + 2\\log|x-1| \\right]_0^{\\frac{1}{2}}","&= \\frac{1}{2}\\log 2 + 2\\log\\frac{1}{2}","&= \\ans{-\\frac{3}{2}\\log 2}"]}],"a":"-\\frac{3}{2}\\log 2","src":"main (1).tex (46)"},
+{"id":"sekibun-shokyu-047","cat":"sekibun","group":"shokyu","no":47,"q":"\\int_{-1}^{1}\\dfrac{x}{x^{2}-5x+6}\\,dx","cond":"","sol":[{"t":"lead","text":"$\\dfrac{x}{x^2-5x+6} = \\dfrac{a}{x-2} + \\dfrac{b}{x-3}$ として，両辺に $x^2-5x+6$ をかけると"},{"t":"eq","lines":["& x = a(x-3) + b(x-2)","& \\therefore \\begin{cases} 1 = a + b \\\\ 0 = -3a - 2b \\end{cases}","& \\therefore a = -2, \\ b = 3"]},{"t":"eq","lines":["\\int_{-1}^1 \\frac{x}{x^2-5x+6} \\, dx &= \\int_{-1}^1 \\left( -\\frac{2}{x-2} + \\frac{3}{x-3} \\right) \\, dx","&= \\left[ -2\\log|x-2| + 3\\log|x-3| \\right]_{-1}^1","&= 3\\log 2 - (-2\\log 3 + 3\\log 4)","&= 3\\log 2 + 2\\log 3 - 6\\log 2","&= 2\\log 3 - 3\\log 2","&= \\ans{\\log\\frac{9}{8}}"]}],"a":"\\log\\frac{9}{8}","src":"main (1).tex (47)"},
+{"id":"sekibun-shokyu-048","cat":"sekibun","group":"shokyu","no":48,"q":"\\int_{-4}^{-3}\\dfrac{1}{x^{2}+2x}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int_{-4}^{-3} \\frac{1}{x^2+2x} \\, dx &= \\int_{-4}^{-3} \\frac{1}{x(x+2)} \\, dx","&= \\int_{-4}^{-3} \\frac{1}{2} \\left( \\frac{1}{x} - \\frac{1}{x+2} \\right) \\, dx","&= \\frac{1}{2} \\left[ \\log|x| - \\log|x+2| \\right]_{-4}^{-3}","&= \\frac{1}{2} (\\log 3 - \\log 4 + \\log 2)","&= \\ans{\\frac{1}{2}\\log\\frac{3}{2}}"]}],"a":"\\frac{1}{2}\\log\\frac{3}{2}","src":"main (1).tex (48)"},
+{"id":"sekibun-shokyu-049","cat":"sekibun","group":"shokyu","no":49,"q":"\\int_{0}^{\\frac{\\pi}{2}}\\sin6x\\cos4x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int_0^{\\frac{\\pi}{2}} \\sin 6x \\cos 4x \\, dx &= \\int_0^{\\frac{\\pi}{2}} \\frac{1}{2} \\{\\sin(6x+4x) + \\sin(6x-4x)\\} \\, dx","&= \\int_0^{\\frac{\\pi}{2}} \\frac{1}{2} (\\sin 10x + \\sin 2x) \\, dx","&= \\left[ -\\frac{1}{20}\\cos 10x - \\frac{1}{4}\\cos 2x \\right]_0^{\\frac{\\pi}{2}}","&= \\ans{\\frac{3}{5}}"]},{"t":"note","text":"積和変換公式を使います．"}],"a":"\\frac{3}{5}","src":"main (1).tex (49)"},
+{"id":"sekibun-shokyu-050","cat":"sekibun","group":"shokyu","no":50,"q":"\\int_{-1}^{1}\\dfrac{x+1}{x^{2}+1}\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int_{-1}^1 \\frac{x+1}{x^2+1} \\, dx &= \\int_{-1}^1 \\left( \\frac{x}{x^2+1} + \\frac{1}{x^2+1} \\right) \\, dx","&= 2\\int_0^1 \\frac{1}{x^2+1} \\, dx","&= 2\\int_0^{\\frac{\\pi}{4}} \\frac{1}{\\tan^2\\theta+1} \\cdot \\frac{1}{\\cos^2\\theta} \\, d\\theta","&= 2\\left[ \\theta \\right]_0^{\\frac{\\pi}{4}}","&= \\ans{\\frac{\\pi}{2}}"]},{"t":"note","text":"$f(x) = \\frac{x}{x^2+1}$ とおくと， $f(-x) = -f(x)$ になるので $f(x)$ は奇関数，$g(x) = \\frac{1}{x^2+1}$ とおくと， $g(-x) = g(x)$ になるので $g(x)$ は偶関数になります．"}],"a":"\\frac{\\pi}{2}","src":"main (1).tex (50)"},
+{"id":"sekibun-shokyu-051","cat":"sekibun","group":"shokyu","no":51,"q":"\\int_{-\\pi}^{\\pi}(x+1)\\sin x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int_{-\\pi}^\\pi (x+1)\\sin x \\, dx &= \\int_{-\\pi}^\\pi (x\\sin x + \\sin x) \\, dx","&= 2\\int_0^\\pi x\\sin x \\, dx","&= 2\\left[ x(-\\cos x) + \\sin x \\right]_0^\\pi","&= \\ans{2\\pi}"]},{"t":"note","text":"$f(x) = x\\sin x$ とおくと， $f(-x) = f(x)$ になるので $f(x)$ は偶関数になります．"}],"a":"2\\pi","src":"main (1).tex (51)"},
+{"id":"sekibun-shokyu-052","cat":"sekibun","group":"shokyu","no":52,"q":"\\int_{-1}^{1}(e^{2x}+e^{-2x})\\,dx","cond":"","sol":[{"t":"lead","text":"$f(x) = e^{2x} + e^{-2x}$ とおくと， $f(-x) = f(x)$．"},{"t":"eq","lines":["\\int_{-1}^1 (e^{2x} + e^{-2x}) \\, dx &= 2\\int_0^1 (e^{2x} + e^{-2x}) \\, dx","&= 2\\left[ \\frac{1}{2}e^{2x} - \\frac{1}{2}e^{-2x} \\right]_0^1","&= \\ans{e^2 - e^{-2}}"]}],"a":"e^2 - e^{-2}","src":"main (1).tex (52)"},
+{"id":"sekibun-shokyu-053","cat":"sekibun","group":"shokyu","no":53,"q":"\\int_{-\\pi}^{\\pi}x\\cos x\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int_{-\\pi}^\\pi x\\cos x \\, dx &= \\ans{0}"]},{"t":"note","text":"$f(x) = x\\cos x$ とおくと， $f(-x) = -f(x)$ になるので $f(x)$ は奇関数になります．"}],"a":"0","src":"main (1).tex (53)"},
+{"id":"sekibun-shokyu-054","cat":"sekibun","group":"shokyu","no":54,"q":"\\int_{-4}^{1}\\left|\\dfrac{1}{2}x+1\\right|\\,dx","cond":"","sol":[{"t":"lead","text":"グラフで該当の定積分を図示して考える"},{"t":"eq","lines":["\\int_{-4}^1 \\left| \\frac{1}{2}x+1 \\right| \\, dx &= 2 \\cdot 1 \\cdot \\frac{1}{2} + 3 \\cdot \\frac{3}{2} \\cdot \\frac{1}{2} = \\ans{\\frac{13}{4}}"]}],"a":"\\frac{13}{4}","src":"main (1).tex (54)"},
+{"id":"sekibun-shokyu-055","cat":"sekibun","group":"shokyu","no":55,"q":"\\int_{-1}^{1}\\left|x^{2}-\\dfrac{1}{2}x-\\dfrac{1}{2}\\right|\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int_{-1}^1 \\left| x^2 - \\frac{1}{2}x - \\frac{1}{2} \\right| \\, dx &= \\int_{-1}^{-\\frac{1}{2}} \\left( x^2 - \\frac{1}{2}x - \\frac{1}{2} \\right) \\, dx - \\int_{-\\frac{1}{2}}^1 \\left( x + \\frac{1}{2} \\right)(x - 1) \\, dx","&= \\left[ \\frac{1}{3}x^3 - \\frac{1}{4}x^2 - \\frac{1}{2}x \\right]_{-1}^{-\\frac{1}{2}} + \\frac{1}{6} \\left\\{ 1 - \\left(-\\frac{1}{2}\\right) \\right\\}^3","&= \\frac{11}{48} + \\frac{1}{6} \\left(\\frac{3}{2}\\right)^3","&= \\frac{11}{48} + \\frac{27}{48}","&= \\ans{\\frac{19}{24}}"]}],"a":"\\frac{19}{24}","src":"main (1).tex (55)"},
+{"id":"sekibun-shokyu-056","cat":"sekibun","group":"shokyu","no":56,"q":"\\int_{0}^{1}\\left|e^{x}-2\\right|\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int_0^1 |e^x - 2| \\, dx &= \\int_0^{\\log 2} (2 - e^x) \\, dx + \\int_{\\log 2}^1 (e^x - 2) \\, dx","&= \\left[ 2x - e^x \\right]_0^{\\log 2} + \\left[ e^x - 2x \\right]_{\\log 2}^1","&= 2(2\\log 2 - 2) + 1 + e - 2","&= \\ans{e + 4\\log 2 - 5}"]}],"a":"e + 4\\log 2 - 5","src":"main (1).tex (56)"},
+{"id":"sekibun-shokyu-057","cat":"sekibun","group":"shokyu","no":57,"q":"\\int_{0}^{\\frac{\\pi}{2}}\\left|\\sin x -\\dfrac{1}{2}\\right|\\,dx","cond":"","sol":[{"t":"eq","lines":["\\int_0^{\\frac{\\pi}{2}} \\left| \\sin x - \\frac{1}{2} \\right| \\, dx &= \\int_0^{\\frac{\\pi}{6}} \\left( \\frac{1}{2} - \\sin x \\right) \\, dx + \\int_{\\frac{\\pi}{6}}^{\\frac{\\pi}{2}} \\left( \\sin x - \\frac{1}{2} \\right) \\, dx","&= \\left[ \\frac{1}{2}x + \\cos x \\right]_0^{\\frac{\\pi}{6}} + \\left[ -\\cos x - \\frac{1}{2}x \\right]_{\\frac{\\pi}{6}}^{\\frac{\\pi}{2}}","&= 2\\left( \\frac{\\pi}{12} + \\frac{\\sqrt{3}}{2} \\right) - 1 - \\frac{\\pi}{4}","&= \\ans{\\sqrt{3} - 1 - \\frac{\\pi}{12}}"]}],"a":"\\sqrt{3} - 1 - \\frac{\\pi}{12}","src":"main (1).tex (57)"}
+];
+/* DATA:END */
+
+const VERSION = '1.2.1', UPDATED = '2026-10-27';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// 式の表示。\ans{…} は答え（太字）
+const KOPT = { throwOnError: true, macros: { '\\ans': '\\boldsymbol{#1}' } };
+const tex = (s, display = false) => katex.renderToString(s, { ...KOPT, displayMode: display });
+// 日本語と $…$ の式がまざった文
+const mixText = s => String(s).split('$').map((x, i) => i % 2 ? tex(x) : esc(x)).join('');
+
+/* ===== 点検（__engine.selfTest()） ===== */
+const TESTS = [];
+const check = (name, fn) => TESTS.push({ name, fn });
+
+check('データ', () => {
+  const err = [], ids = new Set();
+  PROBLEMS.forEach(p => {
+    if (ids.has(p.id)) err.push(`${p.id}: id が重複`);
+    ids.add(p.id);
+    if (!p.sol.some(b => b.t === 'eq')) err.push(`${p.id}: 式の行がない`);
+    if (!p.a) err.push(`${p.id}: 答えがない`);
+    const tryTex = (s, what) => { try { tex(s, true); } catch (e) { err.push(`${p.id} ${what}: ${e.message}`); } };
+    const tryMix = (s, what) => { try { mixText(s); } catch (e) { err.push(`${p.id} ${what}: ${e.message}`); } };
+    tryTex(p.q, '問題'); tryTex(p.a, '答え');
+    if (p.cond) tryMix(p.cond, '条件');
+    p.sol.forEach(b => {
+      if (b.t === 'eq') tryTex(`\\begin{aligned}${b.lines.join('\\\\')}\\end{aligned}`, '式');
+      else if (b.t === 'range') b.rows.flat().forEach(c => tryTex(c, '表'));
+      else tryMix(b.text, b.t);
+    });
+  });
+  const known = new Set(CATEGORIES.flatMap(c => c.groups.map(g => `${c.id}/${g.id}`)));
+  PROBLEMS.forEach(p => { if (!known.has(`${p.cat}/${p.group}`)) err.push(`${p.id}: 登録されていないグループ`); });
+  return err;
+});
+
+// ST を一時的に変えて試し、最後に元に戻す
+const withST = (patch, fn) => {
+  const keep = JSON.parse(JSON.stringify({ groups: ST.groups, count: ST.count, sets: ST.sets, out: ST.out, title: ST.title, view: ST.view })), batch = ST.batch;
+  Object.assign(ST, patch);
+  try { return fn(); } finally { Object.assign(ST, keep); ST.batch = batch; }
+};
+const ALLG = () => CATEGORIES.flatMap(c => c.groups.map(g => `${c.id}/${g.id}`));
+
+check('抽出', () => withST({ groups: ALLG(), count: 5 }, () => {
+  const err = [];
+  for (let k = 0; k < 200; k++) {
+    const A = draw(), ids = new Set(A.map(p => p.id));
+    if (A.length !== 5) err.push(`${k}回目: ${A.length}問`);
+    if (ids.size !== A.length) err.push(`${k}回目: 同じ問題が2回`);
+    if (A.some(p => !ST.groups.includes(`${p.cat}/${p.group}`))) err.push(`${k}回目: 選んでいないグループ`);
+  }
+  ST.count = PROBLEMS.length;
+  if (new Set(draw().map(p => p.id)).size !== PROBLEMS.length) err.push('全問を選ぶと重複がある');
+  ST.count = PROBLEMS.length + 1;
+  const c = canDraw();
+  if (c.ok || c.msg !== `選んだグループには${PROBLEMS.length}問しかありません`) err.push('足りないときの知らせ: ' + c.msg);
+  ST.groups = [];
+  if (canDraw().msg !== 'グループを選んでください') err.push('グループ0個の知らせ: ' + canDraw().msg);
+  return err.slice(0, 5);
+}));
+
+check('計算スペース', () => {
+  const err = [], byNo = n => PROBLEMS.find(p => p.cat === 'sekibun' && p.group === 'shokyu' && p.no === n);
+  PROBLEMS.forEach(p => { const s = spaceOf(p); if (s < 30 || s > 90) err.push(`${p.id}: ${s}mm`); });
+  if (byNo(1) && spaceOf(byNo(1)) !== 32) err.push(`(1) は 32mm のはずが ${spaceOf(byNo(1))}`);
+  if (byNo(5) && spaceOf(byNo(5)) !== 60) err.push(`(5) は 60mm のはずが ${spaceOf(byNo(5))}`);
+  return err;
+});
+
+check('問題プリント', () => withST({ groups: ALLG(), count: 20, sets: 1 }, () => {
+  const err = [], box = $('sheets');
+  for (let k = 0; k < 10; k++) {
+    drawBatch(); render();
+    const qs = [...box.querySelectorAll('.sheet:not(.ans)')];
+    const cells = qs.flatMap(s => [...s.querySelectorAll('.cell')]);
+    if (cells.length !== 20) err.push(`${k}回目: 問題が ${cells.length} 個`);
+    cells.forEach(c => {
+      const f = c.closest('.flow').getBoundingClientRect(), r = c.getBoundingClientRect();
+      if (r.bottom > f.bottom + 1) err.push(`${k}回目: ${c.querySelector('.no').textContent} がページの下からはみ出し`);
+    });
+    if (!qs[0].querySelector('.qz-score')) err.push('1枚目に得点の欄がない');
+    if (qs[1] && qs[1].querySelector('.qz-score')) err.push('2枚目に得点の欄がある');
+    layoutCheck(box).forEach(x => err.push(`${k}回目: ${x.msg}`));
+  }
+  return err.slice(0, 8);
+}));
+
+check('最後のページは左右に分ける', () => withST({ groups: ALLG(), count: 5, sets: 1 }, () => {
+  const err = [];
+  for (let k = 0; k < 20; k++) {
+    drawBatch(); render();
+    const last = [...$('sheets').querySelectorAll('.sheet:not(.ans)')].at(-1);
+    const n = [...last.querySelectorAll('.wcol')].map(c => c.children.length);
+    if (n[0] === 0 || n[1] === 0) err.push(`${k}回目: 左 ${n[0]}問・右 ${n[1]}問`);
+  }
+  return err.slice(0, 3);
+}));
+
+check('解答・解説', () => withST({ groups: ALLG(), count: PROBLEMS.length, out: 'qa' }, () => {
+  const err = [], box = $('sheets');
+  ST.batch = [PROBLEMS.slice()]; render();
+  const ans = [...box.querySelectorAll('.sheet.ans')];
+  if (!ans.length) return ['解答ページがない'];
+  if (box.querySelectorAll('.katex-error').length) err.push('KaTeX のエラー表示がある');
+  ans.forEach((s, i) => { if (s.querySelector('.qa-wrap').innerText.includes('$')) err.push(`${i + 1}枚目に $ が残っている`); });
+  layoutCheck(box).forEach(x => err.push(x.msg));
+  const qa = n => box.querySelectorAll('.sheet.ans .qa')[n - 1];
+  const alts = [...qa(6).querySelectorAll('.qa-alt')].map(x => x.textContent);
+  if (alts.join('/') !== '別解 1/別解 2') err.push('(6) の別解: ' + alts.join('/'));
+  if (qa(37).querySelectorAll('table.rg').length !== 1) err.push('(37) の表がない');
+  if (qa(37).querySelectorAll('.qa-note').length !== 1) err.push('(37) の※がない');
+  // 答えは太字（KaTeX の \boldsymbol は、文字は .boldsymbol、数字は .mathbf になる）
+  PROBLEMS.forEach((p, i) => { if (!qa(i + 1).querySelector('.boldsymbol, .mathbf')) err.push(`(${i + 1}) の答えが太字でない`); });
+  return err.slice(0, 10);
+}));
+
+check('印刷・情報', () => {
+  const err = [], rules = [];
+  [...document.styleSheets].forEach(ss => { try { [...ss.cssRules].forEach(r => { if (r.media && r.media.mediaText === 'print') rules.push(...r.cssRules); }); } catch (e) {} });
+  const txt = rules.map(r => r.cssText).join('\n');
+  if (!rules.length) err.push('印刷用の CSS がない');
+  if (/\.sheet[^{]*\{[^}]*display:\s*none/.test(txt)) err.push('印刷で .sheet を隠している');
+  if (!/show-q \.sheet\.ans[^{]*\{[^}]*display:\s*flex/.test(txt.replace(/\n/g, ' ')) && !/\.sheet\s*\{[^}]*display:\s*flex\s*!important/.test(txt)) err.push('印刷で問題・解答の両方を出す規則がない');
+  if (!/size:\s*a4/i.test(txt)) err.push('A4 の指定がない');   // ブラウザは「A4 portrait」を「a4」と書きかえる
+  if (!$('helpBox').textContent.includes(VERSION)) err.push('情報タブにバージョンがない');
+  if (!$('btnPdf') || !$('btnPrint')) err.push('印刷・PDF のボタンがない');
+  // 使い方タブを開いたまま印刷しても、プリントの画面を出す
+  if (!/#view-main\s*\{[^}]*display:\s*block\s*!important/.test(txt)) err.push('印刷で #view-main を出す規則がない');
+  // 画面で測った高さと印刷の高さが同じ（ちがうと最後の行が切れる）
+  const pr = (txt.match(/\.sheet\s*\{[^}]*height:\s*([\d.]+mm)/) || [])[1];
+  const sc = getComputedStyle(document.querySelector('.sheet') || $('sheets').appendChild(Object.assign(document.createElement('div'), { className: 'sheet' }))).height;
+  const mm = parseFloat(sc) / MM;
+  if (!pr || Math.abs(parseFloat(pr) - mm) > 0.2) err.push(`画面の紙の高さ ${mm.toFixed(1)}mm と印刷の ${pr} がちがう`);
+  return err;
+});
+
+check('複数枚', () => withST({ groups: ALLG(), count: 5, sets: 3, out: 'qa' }, () => {
+  const err = [], box = $('sheets');
+  drawBatch(); render();
+  if (ST.batch.length !== 3) err.push(`${ST.batch.length}枚しか作られない`);
+  ST.batch.forEach((A, k) => { if (new Set(A.map(p => p.id)).size !== 5) err.push(`No.${k + 1} の中で問題が重複`); });
+  const all = [...box.querySelectorAll('.sheet')], firstAns = all.findIndex(s => s.classList.contains('ans'));
+  if (all.slice(firstAns).some(s => !s.classList.contains('ans'))) err.push('問題ページと解答ページがまざっている');
+  const labels = sel => [...new Set(all.filter(s => s.matches(sel)).map(s => (s.querySelector('h2').textContent.match(/No\.(\d+)/) || [])[1]))].join(',');
+  if (labels('.sheet:not(.ans)') !== '1,2,3') err.push('問題の No.: ' + labels('.sheet:not(.ans)'));
+  if (labels('.sheet.ans') !== '1,2,3') err.push('解答の No.: ' + labels('.sheet.ans'));
+  // 解答の No.2 は、問題の No.2 の問題を同じ順で並べる
+  const ansNo2 = all.filter(s => s.matches('.sheet.ans') && /No\.2/.test(s.querySelector('h2').textContent));
+  if (ansNo2[0] && ansNo2[0].querySelectorAll('.qa').length < 1) err.push('解答 No.2 が空');
+  ST.sets = 1; drawBatch(); render();
+  if (/No\./.test(box.querySelector('.sheet h2').textContent)) err.push('1枚のときに No. がつく');
+  return err;
+}));
+
+check('出す内容と簡易解答', () => withST({ groups: ALLG(), count: 5, sets: 2 }, () => {
+  const err = [], box = $('sheets');
+  drawBatch();
+  const kinds = () => [...box.querySelectorAll('.sheet')].map(s => s.classList.contains('ans') ? 'A' : s.classList.contains('back') ? 'B' : 'Q').join('');
+  const want = { q: /^Q+Q+$/, qk: /^(Q+B)(Q+B)$/, qa: /^Q+Q+A+$/, all: /^(Q+B)(Q+B)A+$/ };
+  Object.entries(want).forEach(([m, re]) => { ST.out = m; render(); if (!re.test(kinds())) err.push(`${m}: ページの並び ${kinds()}`); });
+  ST.out = 'qk'; render();
+  [...box.querySelectorAll('.sheet.back')].forEach((s, k) => {
+    const kai = s.querySelector('.kai');
+    if (!kai) { err.push(`裏${k + 1}: 簡易解答がない`); return; }
+    if (!/rotate\(180deg\)|matrix\(-1/.test(getComputedStyle(kai).transform) && !/rotate/.test(kai.style.transform)) err.push(`裏${k + 1}: さかさまでない`);
+    if (kai.querySelectorAll('.kai-a .katex').length !== ST.batch[k].length) err.push(`裏${k + 1}: 答えの数がちがう`);
+    if (!kai.textContent.includes(`No.${k + 1}`)) err.push(`裏${k + 1}: No. がない`);
+    // 見えている部分だけ調べる（.katex-mathml には元の式が入る）
+    if ([...kai.querySelectorAll('.katex-html')].some(x => /displaystyle/.test(x.textContent))) err.push(`裏${k + 1}: 命令の名前が文字として出ている`);
+    const r = kai.getBoundingClientRect(), sr = s.getBoundingClientRect();
+    if (r.bottom > sr.bottom || r.top < sr.top + sr.height / 3) err.push(`裏${k + 1}: 下の部分に収まっていない`);
+  });
+  return err;
+}));
+
+function selfTest(){
+  const out = [];
+  TESTS.forEach(t => {
+    try { (t.fn() || []).forEach(m => out.push(`${t.name}: ${m}`)); }
+    catch (e) { out.push(`${t.name}: ${e.message}`); }
+  });
+  // 点検でプレビューを書きかえたので、元の問題でかき直す
+  if (typeof render === 'function') { if (ST.batch.length) render(); else $('sheets').innerHTML = ''; }
+  return out;
+}
+
+/* ===== タブ ===== */
+$('tabs').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('show', v.id === 'view-' + b.dataset.view));
+});
+
+/* ===== 選択と抽出 ===== */
+const MAXN = 20, MAXSETS = 30, SKEY = 'mathprint_settings';
+const gkey = p => `${p.cat}/${p.group}`;
+const catOf = id => CATEGORIES.find(c => c.id === id);
+const defaultTitle = () => {
+  const c = CATEGORIES.find(c => c.groups.some(g => ST.groups.includes(`${c.id}/${g.id}`))) || CATEGORIES[0];
+  return c ? `${c.name} 演習プリント` : '演習プリント';
+};
+// out：出す内容 q＝問題だけ／qk＝問題＋簡易解答（裏）／qa＝問題＋解説／all＝すべて
+const OUTS = ['q', 'qk', 'qa', 'all'];
+const ST = { groups: ALLG(), count: 5, sets: 1, out: 'all', title: '', view: 'q', batch: [] };
+const hasKai = () => ST.out === 'qk' || ST.out === 'all', hasSol = () => ST.out === 'qa' || ST.out === 'all';
+ST.title = defaultTitle();
+
+// 選んだグループの問題（登録順）
+const pool = () => PROBLEMS.filter(p => ST.groups.includes(gkey(p)));
+function canDraw(){
+  if (!ST.groups.length) return { ok: false, msg: 'グループを選んでください' };
+  const n = pool().length;
+  if (ST.count > n) return { ok: false, msg: `選んだグループには${n}問しかありません` };
+  return { ok: true, msg: '' };
+}
+// 重複なしで count 問。グループの登録順にまとめ、グループの中はランダム順
+function draw(rand = Math.random){
+  const P = pool().slice();
+  for (let i = P.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [P[i], P[j]] = [P[j], P[i]]; }
+  const order = ALLG(), pick = P.slice(0, ST.count);
+  pick.sort((a, b) => order.indexOf(gkey(a)) - order.indexOf(gkey(b)));
+  return pick;
+}
+// sets 枚ぶん。1枚の中は重複なし、別の枚どうしは同じ問題が出てもよい（利用者指定）
+function drawBatch(){
+  ST.batch = Array.from({ length: ST.sets }, () => draw());
+  return ST.batch;
+}
+
+function saveSettings(){
+  try { localStorage.setItem(SKEY, JSON.stringify({ groups: ST.groups, count: ST.count, sets: ST.sets, out: ST.out, title: ST.title })); } catch (e) {}
+}
+function loadSettings(){
+  try {
+    const s = JSON.parse(localStorage.getItem(SKEY) || 'null');
+    if (!s) return;
+    const known = ALLG();
+    if (Array.isArray(s.groups)) ST.groups = s.groups.filter(g => known.includes(g));
+    if (Number.isInteger(s.count)) ST.count = Math.min(MAXN, Math.max(1, s.count));
+    if (Number.isInteger(s.sets)) ST.sets = Math.min(MAXSETS, Math.max(1, s.sets));
+    if (OUTS.includes(s.out)) ST.out = s.out;
+    if (typeof s.title === 'string' && s.title.trim()) ST.title = s.title;
+  } catch (e) {}
+}
+
+function renderGroups(){
+  $('groupBox').innerHTML = CATEGORIES.map(c => `<div class="cat"><span class="cat-name">${esc(c.name)}</span>${
+    c.groups.map(g => {
+      const k = `${c.id}/${g.id}`, n = PROBLEMS.filter(p => gkey(p) === k).length;
+      return `<label class="chk"><input type="checkbox" data-g="${esc(k)}"${ST.groups.includes(k) ? ' checked' : ''}>${esc(g.name)}<small>${n}問</small></label>`;
+    }).join('')}<button class="mini" data-all="${esc(c.id)}">すべて選択</button><button class="mini" data-none="${esc(c.id)}">解除</button></div>`).join('');
+}
+function syncControls(){
+  $('cntOut').textContent = ST.count + '問';
+  $('cntDown').disabled = ST.count <= 1;
+  $('cntUp').disabled = ST.count >= MAXN;
+  $('setOut').textContent = ST.sets + '枚';
+  $('setDown').disabled = ST.sets <= 1;
+  $('setUp').disabled = ST.sets >= MAXSETS;
+  const c = canDraw();
+  $('btnMake').disabled = !c.ok;
+  $('status').textContent = c.msg;
+  $('status').className = c.ok ? '' : 'err';
+}
+$('groupBox').addEventListener('change', e => {
+  const k = e.target.dataset.g; if (!k) return;
+  ST.groups = ALLG().filter(g => g === k ? e.target.checked : ST.groups.includes(g));
+  saveSettings(); syncControls();
+});
+$('groupBox').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const cid = b.dataset.all || b.dataset.none, mine = catOf(cid).groups.map(g => `${cid}/${g.id}`);
+  ST.groups = ALLG().filter(g => mine.includes(g) ? !!b.dataset.all : ST.groups.includes(g));
+  renderGroups(); saveSettings(); syncControls();
+});
+$('cntDown').onclick = () => { ST.count = Math.max(1, ST.count - 1); saveSettings(); syncControls(); };
+$('cntUp').onclick = () => { ST.count = Math.min(MAXN, ST.count + 1); saveSettings(); syncControls(); };
+$('setDown').onclick = () => { ST.sets = Math.max(1, ST.sets - 1); saveSettings(); syncControls(); };
+$('setUp').onclick = () => { ST.sets = Math.min(MAXSETS, ST.sets + 1); saveSettings(); syncControls(); };
+$('title').addEventListener('input', e => { ST.title = e.target.value; saveSettings(); });
+$('btnMake').onclick = () => {
+  if (!canDraw().ok) return;
+  drawBatch(); render();
+  $('btnPrint').disabled = $('btnPdf').disabled = false;
+};
+$('btnPrint').onclick = () => window.print();
+// PDF：印刷画面の「PDFに保存」を使う（文字のまま保存される）。題名を保存のファイル名の候補にする
+function printAsPdf(){
+  const keep = document.title;
+  document.title = printTitle();
+  $('pdfNote').hidden = false;
+  window.addEventListener('afterprint', () => { document.title = keep; }, { once: true });
+  window.print();
+}
+$('btnPdf').onclick = printAsPdf;
+
+/* ===== 使い方・情報 ===== */
+const CHANGES = [
+  ['1.2.1', '2026-10-29', '裏の答えの見出しから「簡易解答」の文字を消す（題名と No. だけ）。'],
+  ['1.2.0', '2026-10-29', '出す内容（問題だけ／問題＋簡易解答／問題＋解説／すべて）。簡易解答は各プリントの裏のページの下に上下さかさまに入れる（長辺とじの両面印刷用）。'],
+  ['1.1.0', '2026-10-27', '枚数の設定（1〜30枚）。1枚ごとに問題を選びなおし、題名に No. をつける。印刷・PDF は問題を全部出したあとに解答を同じ順で出す。'],
+  ['1.0.0', '2026-10-27', '初版。積分計算・初級編57問（問題・途中式・別解・答え）。グループと問題数を選んでランダムに出し、問題プリントと解答・解説を印刷・PDF保存。']
+];
+function renderHelp(){
+  const counts = CATEGORIES.map(c => `<li>${esc(c.name)}：${c.groups.map(g => `${esc(g.name)} ${PROBLEMS.filter(p => p.cat === c.id && p.group === g.id).length}問`).join('、')}</li>`).join('');
+  $('helpBox').innerHTML = `<h2>使い方</h2><ul>
+<li>出したいグループにチェックを入れ、問題数を決めて「問題を作成する」を押します。押すたびに問題が選びなおされます。</li>
+<li>下のプレビューで「問題のみ」「解答・解説」を切りかえて確かめられます。</li>
+<li>「印刷する」で印刷、「PDFを保存」で印刷画面から PDF に保存します。どちらも問題と解答・解説の全ページが出ます。</li>
+<li>問題を増やすときは、問題と解答の .tex（またはPDF）と、入れるカテゴリー・グループを Claude に渡してください。</li></ul>
+<h2>登録している問題</h2><ul>${counts}</ul>
+<h2>バージョン</h2><p class="ver">バージョン ${VERSION}（最終更新 ${UPDATED}）</p>
+<ul>${CHANGES.map(([v, d, t]) => `<li><b>${v}</b>（${d}）${esc(t)}</li>`).join('')}</ul>`;
+}
+
+/* ===== 問題プリント ===== */
+const MM = 3.7795;
+const overH = el => el.scrollHeight > el.clientHeight + 1;
+// 別解より前の、本筋の解答
+const mainSol = p => { const k = p.sol.findIndex(b => b.t === 'alt'); return k < 0 ? p.sol : p.sol.slice(0, k); };
+// 解くスペース（mm）：本筋の式の行数＋置換の前置き1行＋範囲の表2行ぶん
+const spaceOf = p => {
+  const S = mainSol(p);
+  const lines = S.reduce((t, b) => t + (b.t === 'eq' ? b.lines.length : 0), 0) + (S.some(b => b.t === 'lead') ? 1 : 0) + (S.some(b => b.t === 'range') ? 2 : 0);
+  return Math.max(30, Math.min(90, 18 + 7 * lines));
+};
+const printTitle = () => ST.title.trim() || defaultTitle();
+const setLabel = k => ST.batch.length > 1 ? `　No.${k + 1}` : '';
+const head = (first, n, k) => `<div class="qz-head"><h2>${esc(printTitle() + setLabel(k))}</h2><div class="qz-info">${first ? '<span>　　月　　日</span>' : ''}<span>　　年　　組　　番</span><span class="qz-nm">氏名 <span class="uline"></span></span>${first ? `<span class="qz-score">得点<b></b>／${n}</span>` : ''}</div></div>`;
+const newSheet = (box, first, n, k) => {
+  box.insertAdjacentHTML('beforeend', `<div class="sheet">${head(first, n, k)}<div class="flow"></div></div>`);
+  return box.lastElementChild.querySelector('.flow');
+};
+
+// 問題ごとの高さで、左の列 → 右の列 → 次のページ と詰める。列の余りはその列の問題に配分（maxF 倍まで）
+function packCols(A, h1, h2, maxF){
+  const pages = []; let cols = [[], []], c = 0, used = 0;
+  const cap = () => pages.length ? h2 : h1;
+  A.forEach((p, i) => {
+    const need = spaceOf(p);
+    if (used + need > cap() && cols[c].length) {
+      if (c === 0) c = 1; else { pages.push(cols); cols = [[], []]; c = 0; }
+      used = 0;
+    }
+    cols[c].push({ p, i, need }); used += need;
+  });
+  // 最後のページは左の列だけに寄らないよう、順番を保ったまま左右の高さがそろう所で分ける
+  const xs = cols[0].concat(cols[1]), sumOf = a => a.reduce((t, x) => t + x.need, 0);
+  let best = xs.length;
+  for (let j = 1; j < xs.length; j++) if (Math.max(sumOf(xs.slice(0, j)), sumOf(xs.slice(j))) < Math.max(sumOf(xs.slice(0, best)), sumOf(xs.slice(best)))) best = j;
+  pages.push([xs.slice(0, best), xs.slice(best)]);
+  pages.forEach((cs, k) => cs.forEach(col => {
+    const sum = col.reduce((t, x) => t + x.need, 0), H = k ? h2 : h1, f = Math.min(maxF, (H - 0.5) / Math.max(sum, 1));
+    col.forEach(x => { x.h = x.need * f; });
+  }));
+  return pages;
+}
+
+function renderQuestions(box, A, si){
+  const flow1 = newSheet(box, true, A.length, si), h1 = flow1.clientHeight / MM;
+  const tmp = newSheet(box, false, A.length, si), h2 = tmp.clientHeight / MM;
+  tmp.closest('.sheet').remove();
+  const cell = x => `<div class="cell" style="height:${x.h.toFixed(1)}mm"><div class="lb"><span class="no">(${x.i + 1})</span><span class="qx">${tex('\\displaystyle ' + x.p.q)}</span></div>${x.p.cond ? `<div class="cd">${mixText(x.p.cond)}</div>` : ''}</div>`;
+  // 問題が少ないときも列の下まで計算スペースにする（見積もりの3倍まで）
+  packCols(A, h1, h2, 3).forEach((cs, k) => {
+    const flow = k ? newSheet(box, false, A.length, si) : flow1;
+    flow.innerHTML = `<div class="wcols"><div class="wcol lcol">${cs[0].map(cell).join('')}</div><div class="wcol">${cs[1].map(cell).join('')}</div></div>`;
+  });
+}
+
+/* ===== 解答・解説プリント ===== */
+function blockHTML(b){
+  if (b.t === 'eq') return `<div class="qa-eq">${tex(`\\begin{aligned}${b.lines.join('\\\\')}\\end{aligned}`, true)}</div>`;
+  if (b.t === 'range') return `<table class="rg">${b.rows.map(r => `<tr>${r.map(c => `<td>${tex(c)}</td>`).join('')}</tr>`).join('')}</table>`;
+  if (b.t === 'note') return `<div class="qa-note">※ ${mixText(b.text)}</div>`;
+  if (b.t === 'alt') return `<div class="qa-alt">${esc(b.text)}</div>`;
+  return `<div class="qa-text">${mixText(b.text)}</div>`;
+}
+function solHTML(p, n){
+  const lead = p.sol[0] && p.sol[0].t === 'lead' ? p.sol[0] : null;
+  const rest = lead ? p.sol.slice(1) : p.sol;
+  return `<div class="qa"><div class="qa-head"><span class="no">(${n})</span>${lead ? ' ' + mixText(lead.text) : ''}</div>${rest.map(blockHTML).join('')}</div>`;
+}
+// 式がページの幅をこえるときは、その式だけ文字を小さくする（70% まで。それ以上は点検で知らせる）
+// 書きこみ → 読みとり → 書きこみ をまとめ、計測のたびに画面の再計算が起きないようにする
+function fitWide(root){
+  const ms = [...root.querySelectorAll('.qa-eq')];
+  ms.forEach(m => { m.style.fontSize = ''; });
+  const sz = ms.map(m => [m.clientWidth, m.scrollWidth]);
+  ms.forEach((m, i) => { const [avail, wd] = sz[i]; if (wd > avail + 1) m.style.fontSize = Math.max(70, Math.floor(100 * avail / wd)) + '%'; });
+}
+// 上から詰め、入らない問題は次のページへ（問題の途中では分けない。1問が1ページに入らないときだけブロックの境目で分ける）
+function packAnswers(box, A, fs, si){
+  const addPage = () => {
+    box.insertAdjacentHTML('beforeend', `<div class="sheet ans"><div class="qz-head"><h2>${esc(printTitle() + setLabel(si))}　解答・解説</h2></div><div class="qa-wrap" style="font-size:${fs}pt"></div></div>`);
+    return box.lastElementChild.querySelector('.qa-wrap');
+  };
+  let w = addPage(), pages = 1;
+  A.forEach((p, i) => {
+    w.insertAdjacentHTML('beforeend', solHTML(p, i + 1));
+    const qa = w.lastElementChild;
+    fitWide(qa);
+    if (!overH(w)) return;
+    if (qa.previousElementSibling) { qa.remove(); w = addPage(); pages++; w.appendChild(qa); }
+    // 1問が1ページに入らない：入らなくなったブロックから先を次のページへ
+    let cur = qa;
+    while (overH(w) && cur.children.length > 1) {
+      const moved = document.createElement('div'); moved.className = 'qa';
+      while (overH(w) && cur.children.length > 1) moved.prepend(cur.lastElementChild);
+      w = addPage(); pages++; w.appendChild(moved); cur = moved;
+    }
+  });
+  return pages;
+}
+// まず 10pt。9pt にするとページが減るなら 9pt
+function renderAnswers(box, A, si){
+  if (!A.length) return;
+  const keep = box.querySelectorAll('.sheet').length;
+  const n10 = packAnswers(box, A, 10, si);
+  const tail = () => [...box.querySelectorAll('.sheet')].slice(keep);
+  const html10 = tail();
+  html10.forEach(s => s.remove());
+  const n9 = packAnswers(box, A, 9, si);
+  if (n9 < n10) return;
+  tail().forEach(s => s.remove());
+  packAnswers(box, A, 10, si);
+}
+
+// 表示の点検：式の折り返し・はみ出し・高さ不足
+function layoutCheck(box){
+  const out = [];
+  const where = el => {
+    const s = el.closest('.sheet'), pg = [...box.querySelectorAll('.sheet')].indexOf(s) + 1;
+    const n = el.closest('.cell,.qa'); const no = n && n.querySelector('.no');
+    return `${pg}ページ${no ? ' ' + no.textContent : ''}`;
+  };
+  box.querySelectorAll('.katex').forEach(k => {
+    const base = k.querySelector('.katex-html'); if (!base || k.closest('.katex-display')) return;
+    // 同じ行の部品は必ず上下に重なる。重ならない部品があれば2行に折れている
+    const rs = [...base.children].map(b => b.getBoundingClientRect()).filter(r => r.width > 0);
+    if (rs.length > 1 && Math.max(...rs.map(r => r.top)) >= Math.min(...rs.map(r => r.bottom)) - 0.5) out.push({ msg: `${where(k)} 式が折り返し`, type: 'wrap' });
+  });
+  box.querySelectorAll('.cell .lb, .cell .cd').forEach(el => { if (el.scrollWidth > el.clientWidth + 2) out.push({ msg: `${where(el)} 横にはみ出し`, type: 'overflow' }); });
+  box.querySelectorAll('.cell').forEach(el => { if (overH(el)) out.push({ msg: `${where(el)} 高さが足りない`, type: 'height' }); });
+  box.querySelectorAll('.flow').forEach(el => { if (overH(el)) out.push({ msg: `${where(el)} ページの下からはみ出し`, type: 'page' }); });
+  box.querySelectorAll('.qa-wrap').forEach(el => { if (overH(el)) out.push({ msg: `${where(el)} 解答がページからはみ出し`, type: 'page' }); });
+  box.querySelectorAll('.qa-eq').forEach(m => {
+    if (m.scrollWidth > m.clientWidth + 1) out.push({ msg: `${where(m)} の式が幅をこえています`, type: 'overflow' });
+  });
+  box.querySelectorAll('.qa-head, .qa-text, .qa-note').forEach(el => { if (el.scrollWidth > el.clientWidth + 2) out.push({ msg: `${where(el)} 横にはみ出し`, type: 'overflow' }); });
+  return out;
+}
+
+function render(){
+  const box = $('sheets');
+  box.className = 'sheet-wrap';           // 計測のあいだは全ページを表示しておく
+  box.innerHTML = '';
+  // 問題を全部出したあとに、解答を同じ順で出す
+  ST.batch.forEach((A, k) => { renderQuestions(box, A, k); if (hasKai()) renderBack(box, A, k); });
+  if (hasSol()) ST.batch.forEach((A, k) => renderAnswers(box, A, k));
+  const all = [...box.querySelectorAll('.sheet')];
+  all.forEach((s, i) => s.insertAdjacentHTML('beforeend', `<div class="pgno">${i + 1} / ${all.length}</div>`));
+  const an = all.filter(s => s.classList.contains('ans')).length;
+  const bk = all.filter(s => s.classList.contains('back')).length;
+  $('pageInfo').textContent = `全${all.length}ページ（問題 ${all.length - an - bk}${bk ? `・簡易解答（裏）${bk}` : ''}${an ? `・解答解説 ${an}` : ''}）／${(ST.batch[0] || []).length}問 × ${ST.batch.length}枚`;
+  const issues = layoutCheck(box);
+  $('layoutWarn').textContent = issues.length ? `表示の点検：${issues.length}か所で式の折り返し・はみ出しがあります（${issues.slice(0, 4).map(x => x.msg).join('、')}${issues.length > 4 ? ' など' : ''}）` : '';
+  applyPv();
+}
+// 各枚の裏（簡易解答）
+function renderBack(box, A, si){
+  box.insertAdjacentHTML('beforeend', `<div class="sheet back"><div class="kai"><h3>${esc(printTitle() + setLabel(si))}</h3><div class="kai-grid">${
+    A.map((p, i) => `<div class="kai-a"><span class="no">(${i + 1})</span>${tex('\\displaystyle ' + p.a)}</div>`).join('')}</div></div></div>`);
+}
+$('outSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  ST.out = b.dataset.out; saveSettings(); syncOut();
+  if (ST.batch.length) render();
+});
+const syncOut = () => document.querySelectorAll('#outSeg button').forEach(x => x.classList.toggle('on', x.dataset.out === ST.out));
+const applyPv = () => { $('sheets').className = 'sheet-wrap show-' + ST.view; };
+$('pvSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  ST.view = b.dataset.pv;
+  document.querySelectorAll('#pvSeg button').forEach(x => x.classList.toggle('on', x === b));
+  applyPv();
+});
+
+loadSettings();
+$('title').value = ST.title;
+renderGroups(); syncControls(); syncOut(); renderHelp();
+window.__engine = { CATEGORIES, PROBLEMS, ST, tex, mixText, pool, canDraw, draw, drawBatch, render, spaceOf, layoutCheck, selfTest };
+</script>
+</body>
+</html>
